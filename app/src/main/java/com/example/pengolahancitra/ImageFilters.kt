@@ -19,7 +19,7 @@ object ImageFilters {
      */
     fun setGreyFilter(oldBitmap: Bitmap): Bitmap {
         // copying to newBitmap for manipulation
-        val newBitmap = oldBitmap.copy(Bitmap.Config.ARGB_8888, true)
+        val newBitmap = oldBitmap.copy(Bitmap.Config.RGB_565, true)
 
         // height and width of Image
         val h = newBitmap.height
@@ -37,14 +37,13 @@ object ImageFilters {
                 val oldRed = Color.red(oldPixel)
                 val oldBlue = Color.blue(oldPixel)
                 val oldGreen = Color.green(oldPixel)
-                val oldAlpha = Color.alpha(oldPixel)
 
                 // Algorithm for getting new values after calculation of filter
                 // Algorithm for GREY FILTER, by intensity of each pixel
                 val intensity = (oldRed + oldBlue + oldGreen) / 3
 
                 // applying new pixel values to newBitmap
-                val newPixel = Color.argb(oldAlpha, intensity, intensity, intensity)
+                val newPixel = Color.rgb(intensity, intensity, intensity)
                 newBitmap.setPixel(i, j, newPixel)
             }
         }
@@ -100,7 +99,7 @@ object ImageFilters {
      * @return newBitmap new image after filter
      */
     fun setBlackAndWhite(oldBitmap: Bitmap): Bitmap {
-        val newBitmap = oldBitmap.copy(Bitmap.Config.ARGB_8888, true)
+        val newBitmap = oldBitmap.copy(Bitmap.Config.RGB_565, true)
         val h = newBitmap.height
         val w = newBitmap.width
 
@@ -116,19 +115,18 @@ object ImageFilters {
                 val oldRed = Color.red(oldPixel)
                 val oldGreen = Color.green(oldPixel)
                 val oldBlue = Color.blue(oldPixel)
-                val oldAlpha = Color.alpha(oldPixel)
 
                 // Algorithm for getting new values after calculation of filter
                 // Algorithm for MONOCHROME FILTER
                 val intensity = (oldRed + oldBlue + oldGreen) / 3
 
                 // condition for monochrome
-                val intensityFactor = 128
+                val threshold = 128
                 val binaryColor =
-                    if (intensity > intensityFactor) HIGHEST_COLOR_VALUE else LOWEST_COLOR_VALUE
+                    if (intensity > threshold) HIGHEST_COLOR_VALUE else LOWEST_COLOR_VALUE
 
                 // applying new pixel value to newBitmap
-                val newPixel = Color.argb(oldAlpha, binaryColor, binaryColor, binaryColor)
+                val newPixel = Color.rgb(binaryColor, binaryColor, binaryColor)
                 newBitmap.setPixel(i, j, newPixel)
             }
         }
