@@ -2,6 +2,8 @@ package com.example.pengolahancitra
 
 import android.graphics.Bitmap
 import android.graphics.Color
+import kotlin.math.absoluteValue
+import kotlin.math.roundToInt
 
 /**
  * Created by Fakhry on 28/05/2021.
@@ -130,6 +132,87 @@ object ImageFilters {
                 newBitmap.setPixel(i, j, newPixel)
             }
         }
+
         return newBitmap
+    }
+
+
+    /**
+     * Apply Automatic Thresholding on image
+     *
+     * @param oldBitmap image where filter to be applied
+     * @return newBitmap new image after filter
+     */
+    fun automaticThresholding(oldBitmap: Bitmap): Bitmap {
+        val grayBitmap = setGreyFilter(oldBitmap)
+        val newBitmap = grayBitmap.copy(Bitmap.Config.RGB_565, true)
+        val threshold = findThresholdAutomatically(grayBitmap)
+
+        val h = newBitmap.height
+        val w = newBitmap.width
+
+        // traversing each pixel in Image as an 2D Array
+        for (i in 0 until w) {
+            for (j in 0 until h) {
+
+                // operating on each pixel
+                val oldPixel = oldBitmap.getPixel(i, j)
+
+                // so, getting current values of pixel
+                val intensity = Color.red(oldPixel)
+
+                // condition for monochrome
+                val binaryColor =
+                    if (intensity > threshold) HIGHEST_COLOR_VALUE else LOWEST_COLOR_VALUE
+
+                // applying new pixel value to newBitmap
+                val newPixel = Color.rgb(binaryColor, binaryColor, binaryColor)
+                newBitmap.setPixel(i, j, newPixel)
+            }
+        }
+
+        return newBitmap
+    }
+
+    private fun findThresholdAutomatically(oldBitmap: Bitmap): Int {
+        val tInitial = 192
+        var tBefore = tInitial
+
+        val h = oldBitmap.height
+        val w = oldBitmap.width
+
+        var loopCounter = 0
+        while (true) {
+            val g1: ArrayList<Int> = arrayListOf()
+            val g2: ArrayList<Int> = arrayListOf()
+
+            for (i in 0 until w) {
+                for (j in 0 until h) {
+                    val oldPixel = oldBitmap.getPixel(i, j)
+                    val intensity = Color.red(oldPixel)
+
+                    // condition for set g1 and g2
+                    if (intensity > tBefore) {
+                        g1.add(intensity)
+                    } else {
+                        g2.add(intensity)
+                    }
+                }
+            }
+
+            val m1 = g1.average().roundToInt()
+            val m2 = g2.average().roundToInt()
+
+            val tNew = (m1 + m2) / 2
+            val absT = (tNew - tInitial).absoluteValue
+            val deltaT = (tBefore - tNew).absoluteValue
+
+            tBefore = tNew
+            loopCounter++
+
+            if (absT > deltaT && loopCounter > 2) break
+        }
+
+        return tBefore
     }
 }
