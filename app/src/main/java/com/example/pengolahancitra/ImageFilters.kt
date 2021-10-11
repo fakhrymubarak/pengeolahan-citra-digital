@@ -94,6 +94,7 @@ object ImageFilters {
         return newBitmap
     }
 
+
     /**
      * Apply Monochrome Filter on image
      *

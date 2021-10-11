@@ -56,52 +56,15 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, View.OnLongClick
             btnNoiseSalt.setOnLongClickListener(this@MainActivity)
             btnAvgFilter.setOnLongClickListener(this@MainActivity)
         }
-
-        //Set Default Bitmap
-//        val fileUri = "content://com.android.providers.media.documents/document/image%3A220701".toUri()
-//        defaultBitmap = BitmapFactory.decodeStream(contentResolver.openInputStream(fileUri))
-//        binding.ivImageTaken.setImageBitmap(defaultBitmap)
-
     }
-
-    /** Solution For Deprecated Activity For Result
-    var resultLauncher =
-    registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-    when (result.resultCode) {
-    Activity.RESULT_OK -> {
-    //Image Uri will not be null for RESULT_OK
-    val fileUri = result.data?.data!!
-    //Set Bitmap
-    defaultBitmap =
-    BitmapFactory.decodeStream(contentResolver.openInputStream(fileUri))
-    // Use Uri object instead of File to avoid storage permissions
-
-    isPictureAdded = true
-    binding.ivImageTaken.setImageBitmap(defaultBitmap)
-    binding.ivImageTaken.elevation = 0F
-    }
-    ImagePicker.RESULT_ERROR -> {
-    showToast(ImagePicker.getError(result.data))
-    isPictureAdded = false
-    }
-    else -> {
-    showToast("Gagal mengupload foto")
-    isPictureAdded = false
-    }
-    }
-    }
-     */
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         when (resultCode) {
             RESULT_OK -> {
                 val fileUri = data?.data!!
-
                 //Set Bitmap
-                defaultBitmap =
-                    BitmapFactory.decodeStream(contentResolver.openInputStream(fileUri))
-                // Use Uri object instead of File to avoid storage permissions
+                defaultBitmap = BitmapFactory.decodeStream(contentResolver.openInputStream(fileUri))
 
                 isPictureAdded = true
                 binding.ivImageTaken.setImageBitmap(defaultBitmap)
@@ -147,12 +110,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, View.OnLongClick
 
             binding.btnImageInformation -> {
                 if (isPictureAdded) {
-//                    val bitmapHeight = defaultBitmap.height
-//                    val bitmapWidth = defaultBitmap.width
-//                    val bitmapByteCount = defaultBitmap.byteCount
-//                    val bitmapDensity = defaultBitmap.density
-//                    val bitmapIsMutable = defaultBitmap.isMutable
-//                    val bitmapRowBytes = defaultBitmap.rowBytes
+                    defaultBitmap = ImageFilters.automaticThresholding(defaultBitmap)
+                    binding.ivImageTaken.setImageBitmap(defaultBitmap)
                 } else showToast("Gambar belum ditambahkan.")
             }
 
