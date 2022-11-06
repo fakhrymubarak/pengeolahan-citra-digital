@@ -1,4 +1,4 @@
-package com.example.pengolahancitra
+package com.example.pengolahancitra.helpers.image_processing
 
 import android.graphics.Bitmap
 

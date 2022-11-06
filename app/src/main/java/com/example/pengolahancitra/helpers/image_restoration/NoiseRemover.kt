@@ -1,4 +1,4 @@
-package com.example.pengolahancitra
+package com.example.pengolahancitra.helpers.image_restoration
 
 import android.graphics.Bitmap
 import android.graphics.Color
@@ -47,29 +47,6 @@ object NoiseRemover {
                 avgRed /= totalIteration
                 avgGreen /= totalIteration
                 avgBlue /= totalIteration
-
-                // CONQUER THE RISE OF SALT(WHITE)
-                /**
-                if(newRed == 255 && newGreen == 255 && newBlue == 255){
-                for (m in i - 1..i + 1) {
-                for (n in j - 1..j + 1) {
-
-                //Try and catch to avoid out of index iteration
-                try {
-                val mnPixel = oldBitmap.getPixel(m, n)
-                avgRed += Color.red(mnPixel)
-                avgGreen += Color.green(mnPixel)
-                avgBlue += Color.blue(mnPixel)
-
-                totalIteration++
-                } catch (e: Exception) {}
-                }
-                }
-                avgRed /= totalIteration
-                avgGreen /= totalIteration
-                avgBlue /= totalIteration
-                }
-                 */
 
                 //use the avg filter
                 val newPixel = Color.argb(oldAlpha, avgRed, avgGreen, avgBlue)

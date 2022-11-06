@@ -1,4 +1,4 @@
-package com.example.pengolahancitra
+package com.example.pengolahancitra.helpers.image_restoration
 
 import android.graphics.Bitmap
 import android.graphics.Color
@@ -8,7 +8,7 @@ import kotlin.random.Random
  * Created by Fakhry on 28/05/2021.
  */
 object NoiseSetter {
-    fun setNoiseSaltAndPepper(oldBitmap: Bitmap) : Bitmap{
+    fun setNoiseSaltAndPepper(oldBitmap: Bitmap): Bitmap {
         // copying to newBitmap for manipulation
         val newBitmap = oldBitmap.copy(Bitmap.Config.ARGB_8888, true)
 
@@ -31,13 +31,13 @@ object NoiseSetter {
                 val oldAlpha = Color.alpha(oldPixel)
 
                 // set noise probability
-                val noiseProb = 10;
+                val noiseProb = 10
                 val randInt = Random.nextInt(0, 100)
 
                 //set new pixel
-                val newPixel = if(randInt < noiseProb){
+                val newPixel = if (randInt < noiseProb) {
                     Color.argb(oldAlpha, 255, 255, 255)
-                }else{
+                } else {
                     Color.argb(oldAlpha, oldRed, oldGreen, oldBlue)
                 }
                 newBitmap.setPixel(i, j, newPixel)

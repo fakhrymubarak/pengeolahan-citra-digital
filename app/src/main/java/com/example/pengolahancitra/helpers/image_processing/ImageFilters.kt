@@ -1,4 +1,4 @@
-package com.example.pengolahancitra
+package com.example.pengolahancitra.helpers.image_processing
 
 import android.graphics.Bitmap
 import android.graphics.Color
@@ -140,6 +140,7 @@ object ImageFilters {
 
     /**
      * Apply Automatic Thresholding on image
+     * This filter convert image to binary image using automatic thresholding
      *
      * @param oldBitmap image where filter to be applied
      * @return newBitmap new image after filter
