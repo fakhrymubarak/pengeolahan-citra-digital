@@ -10,16 +10,13 @@ import kotlin.math.roundToInt
  */
 object ImageFilters {
 
-    private const val HIGHEST_COLOR_VALUE = 255
-    private const val LOWEST_COLOR_VALUE = 0
-
     /**
      * Apply Grey Filter on image
      *
      * @param oldBitmap image where filter to be applied
      * @return newBitmap new image after filter
      */
-    fun setGreyFilter(oldBitmap: Bitmap): Bitmap {
+    fun setGrayscaleFilter(oldBitmap: Bitmap): Bitmap {
         // copying to newBitmap for manipulation
         val newBitmap = oldBitmap.copy(Bitmap.Config.RGB_565, true)
 
@@ -60,6 +57,8 @@ object ImageFilters {
      * @return newBitmap new image after filter
      */
     fun setNegativeFilter(oldBitmap: Bitmap): Bitmap {
+        val highestColorValue = 255
+
         // copying to newBitmap for manipulation
         val newBitmap = oldBitmap.copy(Bitmap.Config.ARGB_8888, true)
 
@@ -82,9 +81,9 @@ object ImageFilters {
 
                 // Algorithm for getting new values after calculation of filter
                 // Algorithm for NEGATIVE FILTER
-                val newRed = HIGHEST_COLOR_VALUE - oldRed
-                val newBlue = HIGHEST_COLOR_VALUE - oldBlue
-                val newGreen = HIGHEST_COLOR_VALUE - oldGreen
+                val newRed = highestColorValue - oldRed
+                val newBlue = highestColorValue - oldBlue
+                val newGreen = highestColorValue - oldGreen
 
                 // applying new pixel value to newBitmap
                 val newPixel = Color.rgb(newRed, newGreen, newBlue)
@@ -125,11 +124,9 @@ object ImageFilters {
 
                 // condition for monochrome
                 val threshold = 128
-                val binaryColor =
-                    if (intensity > threshold) HIGHEST_COLOR_VALUE else LOWEST_COLOR_VALUE
 
                 // applying new pixel value to newBitmap
-                val newPixel = Color.rgb(binaryColor, binaryColor, binaryColor)
+                val newPixel = if (intensity > threshold) Color.WHITE else Color.BLACK
                 newBitmap.setPixel(i, j, newPixel)
             }
         }
@@ -146,7 +143,7 @@ object ImageFilters {
      * @return newBitmap new image after filter
      */
     fun automaticThresholding(oldBitmap: Bitmap): Bitmap {
-        val grayBitmap = setGreyFilter(oldBitmap)
+        val grayBitmap = setGrayscaleFilter(oldBitmap)
         val newBitmap = grayBitmap.copy(Bitmap.Config.RGB_565, true)
         val threshold = findThresholdAutomatically(grayBitmap)
 
@@ -163,12 +160,8 @@ object ImageFilters {
                 // so, getting current values of pixel
                 val intensity = Color.red(oldPixel)
 
-                // condition for monochrome
-                val binaryColor =
-                    if (intensity > threshold) HIGHEST_COLOR_VALUE else LOWEST_COLOR_VALUE
-
                 // applying new pixel value to newBitmap
-                val newPixel = Color.rgb(binaryColor, binaryColor, binaryColor)
+                val newPixel = if (intensity > threshold) Color.WHITE else Color.BLACK
                 newBitmap.setPixel(i, j, newPixel)
             }
         }

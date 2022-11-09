@@ -9,9 +9,6 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.fakhry.pengolahancitra.Utils
 import com.fakhry.pengolahancitra.databinding.ActivityMainBinding
-import com.fakhry.pengolahancitra.helpers.image_processing.ImageFilters
-import com.fakhry.pengolahancitra.helpers.image_processing.ImageFlipping
-import com.fakhry.pengolahancitra.helpers.image_processing.ImageRotating
 import com.fakhry.pengolahancitra.utils.collectLifecycleFlow
 import com.fakhry.pengolahancitra.utils.custom_view.CustomProgress
 import com.fakhry.pengolahancitra.utils.isVisible
@@ -22,7 +19,6 @@ import com.karumi.dexter.listener.PermissionDeniedResponse
 import com.karumi.dexter.listener.PermissionGrantedResponse
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.single.PermissionListener
-import kotlinx.coroutines.runBlocking
 
 /**
  * Created by Fakhry on 28/05/2021.
@@ -58,53 +54,20 @@ class MainActivity : AppCompatActivity(), PermissionListener {
                     Utils.saveImage(defaultBitmap, this@MainActivity, "PCD")
                 } else showToast("Gambar belum ditambahkan.")
             }
-            btnImageInformation.setOnClickListener {
-                if (isPictureAdded) {
-                    defaultBitmap = ImageFilters.automaticThresholding(defaultBitmap)
-                    binding.ivImageTaken.setImageBitmap(defaultBitmap)
-                } else showToast("Gambar belum ditambahkan.")
-            }
-            btnSetToGrayscale.setOnClickListener {
-                if (isPictureAdded) {
-                    defaultBitmap = ImageFilters.setGreyFilter(defaultBitmap)
-                    binding.ivImageTaken.setImageBitmap(defaultBitmap)
-                } else showToast("Gambar belum ditambahkan.")
-            }
-            btnFlipHorizontal.setOnClickListener {
-                if (isPictureAdded) {
-                    defaultBitmap = ImageFlipping.horizontalFlip(defaultBitmap)
-                    binding.ivImageTaken.setImageBitmap(defaultBitmap)
-                } else showToast("Gambar belum ditambahkan.")
-            }
-            btnFlipVertical.setOnClickListener {
-                if (isPictureAdded) {
-                    runBlocking {
-                        defaultBitmap = ImageFlipping.verticalFlip(defaultBitmap)
-                    }
-                    binding.ivImageTaken.setImageBitmap(defaultBitmap)
-                } else showToast("Gambar belum ditambahkan.")
-            }
-            btnRotateLeft90.setOnClickListener {
-                if (isPictureAdded) {
-                    defaultBitmap = ImageRotating.rotateLeft90(defaultBitmap)
-                    binding.ivImageTaken.setImageBitmap(defaultBitmap)
-                } else showToast("Gambar belum ditambahkan.")
-            }
-            btnRotateRight90.setOnClickListener {
-                if (isPictureAdded) {
-                    defaultBitmap = ImageRotating.rotateRight90(defaultBitmap)
-                    binding.ivImageTaken.setImageBitmap(defaultBitmap)
-                } else showToast("Gambar belum ditambahkan.")
-            }
-            btnMonochrome.setOnClickListener {
-                if (isPictureAdded) {
-                    defaultBitmap = ImageFilters.setBlackAndWhite(defaultBitmap)
-                    binding.ivImageTaken.setImageBitmap(defaultBitmap)
-                } else showToast("Gambar belum ditambahkan.")
-            }
+
+            btnImageInformation.setOnClickListener { viewModel.updateBitmapWithAutomaticThresholding() }
+            btnSetToGrayscale.setOnClickListener { viewModel.updateBitmapToGrayscale() }
+            btnMonochrome.setOnClickListener { viewModel.updateBitmapToMonochrome() }
+
+            btnFlipHorizontal.setOnClickListener { viewModel.updateBitmapWithHorizontalFlip() }
+            btnFlipVertical.setOnClickListener { viewModel.updateBitmapWithVerticalFlip() }
+
+            btnRotateLeft90.setOnClickListener { viewModel.updateBitmapWithRotateLeft90() }
+            btnRotateRight90.setOnClickListener { viewModel.updateBitmapWithRotateRight90() }
 
             btnNoiseSalt.setOnClickListener { viewModel.updateBitmapWithSaltPaper() }
             btnAvgFilter.setOnClickListener { viewModel.updateBitmapWithAvgFilter() }
+
             btnRgbToHsv.setOnClickListener { viewModel.updateBitmapToHsv() }
             btnRgbToHsvLibrary.setOnClickListener { viewModel.updateBitmapToHsv(true) }
 

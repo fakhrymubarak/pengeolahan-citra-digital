@@ -3,6 +3,9 @@ package com.fakhry.pengolahancitra.pages
 import android.graphics.Bitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.fakhry.pengolahancitra.helpers.image_processing.ImageFilters
+import com.fakhry.pengolahancitra.helpers.image_processing.ImageFlipping
+import com.fakhry.pengolahancitra.helpers.image_processing.ImageRotating
 import com.fakhry.pengolahancitra.helpers.image_restoration.NoiseRemover
 import com.fakhry.pengolahancitra.helpers.image_restoration.NoiseSetter
 import com.fakhry.pengolahancitra.helpers.pattern_recognition.RgbImageToHsv.manipulateHsv
@@ -34,6 +37,75 @@ class MainViewModel : ViewModel() {
     }
 
     /* SECTION - IMAGE PROCESSING*/
+    fun updateBitmapWithRotateLeft90() {
+        val currentActiveBitmap = _activeBitmapState.value ?: return
+        viewModelScope.launch(Dispatchers.IO) {
+            _loadingState.emit(true)
+            addUndo(currentActiveBitmap, true)
+            _activeBitmapState.value = ImageRotating.rotateLeft90(currentActiveBitmap)
+            _loadingState.emit(false)
+        }
+    }
+
+    fun updateBitmapWithRotateRight90() {
+        val currentActiveBitmap = _activeBitmapState.value ?: return
+        viewModelScope.launch(Dispatchers.IO) {
+            _loadingState.emit(true)
+            addUndo(currentActiveBitmap, true)
+            _activeBitmapState.value = ImageRotating.rotateRight90(currentActiveBitmap)
+            _loadingState.emit(false)
+        }
+    }
+
+    fun updateBitmapWithHorizontalFlip() {
+        val currentActiveBitmap = _activeBitmapState.value ?: return
+        viewModelScope.launch(Dispatchers.IO) {
+            _loadingState.emit(true)
+            addUndo(currentActiveBitmap, true)
+            _activeBitmapState.value = ImageFlipping.horizontalFlip(currentActiveBitmap)
+            _loadingState.emit(false)
+        }
+    }
+
+    fun updateBitmapWithVerticalFlip() {
+        val currentActiveBitmap = _activeBitmapState.value ?: return
+        viewModelScope.launch(Dispatchers.IO) {
+            _loadingState.emit(true)
+            addUndo(currentActiveBitmap, true)
+            _activeBitmapState.value = ImageFlipping.verticalFlip(currentActiveBitmap)
+            _loadingState.emit(false)
+        }
+    }
+
+    fun updateBitmapWithAutomaticThresholding() {
+        val currentActiveBitmap = _activeBitmapState.value ?: return
+        viewModelScope.launch(Dispatchers.IO) {
+            _loadingState.emit(true)
+            addUndo(currentActiveBitmap, true)
+            _activeBitmapState.value = ImageFilters.automaticThresholding(currentActiveBitmap)
+            _loadingState.emit(false)
+        }
+    }
+
+    fun updateBitmapToGrayscale() {
+        val currentActiveBitmap = _activeBitmapState.value ?: return
+        viewModelScope.launch(Dispatchers.IO) {
+            _loadingState.emit(true)
+            addUndo(currentActiveBitmap, true)
+            _activeBitmapState.value = ImageFilters.setGrayscaleFilter(currentActiveBitmap)
+            _loadingState.emit(false)
+        }
+    }
+
+    fun updateBitmapToMonochrome() {
+        val currentActiveBitmap = _activeBitmapState.value ?: return
+        viewModelScope.launch(Dispatchers.IO) {
+            _loadingState.emit(true)
+            addUndo(currentActiveBitmap, true)
+            _activeBitmapState.value = ImageFilters.setBlackAndWhite(currentActiveBitmap)
+            _loadingState.emit(false)
+        }
+    }
 
     /* SECTION - IMAGE RESTORATION  */
     fun updateBitmapWithSaltPaper() {
