@@ -1,7 +1,6 @@
 package com.fakhry.pengolahancitra.pages
 
 import android.graphics.Bitmap
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fakhry.pengolahancitra.helpers.pattern_recognition.RgbImageToHsv.manipulateHsv
@@ -30,7 +29,6 @@ class MainViewModel : ViewModel() {
         if (shouldClearRedo) clearRedoChanges()
         _listChangesToUndo.add(bitmap)
         isButtonUndoEnabled.value = true
-        Log.e("MainViewModel", "undoChanges -> $_listChangesToUndo")
     }
 
     fun undoChanges() {
@@ -51,7 +49,6 @@ class MainViewModel : ViewModel() {
     private fun addRedo(bitmap: Bitmap) {
         _listChangesToRedo.add(bitmap)
         isButtonRedoEnabled.value = true
-        Log.e("MainViewModel", "redoChanges -> $_listChangesToRedo")
     }
 
     fun redoChanges() {
@@ -85,7 +82,7 @@ class MainViewModel : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             _loadingState.emit(true)
             addUndo(currentActiveBitmap, true)
-            _activeBitmapState.value = currentActiveBitmap.manipulateHsv(0.5, 0.5, 0.5, usingLibrary)
+            _activeBitmapState.value = currentActiveBitmap.manipulateHsv(usingLibrary)
             _loadingState.emit(false)
         }
     }
