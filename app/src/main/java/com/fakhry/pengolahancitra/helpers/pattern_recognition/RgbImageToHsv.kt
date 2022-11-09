@@ -7,7 +7,12 @@ import androidx.core.graphics.green
 import androidx.core.graphics.red
 
 object RgbImageToHsv {
-    fun Bitmap.manipulateHsv(hue: Double, saturation: Double, value: Double): Bitmap {
+    fun Bitmap.manipulateHsv(
+        hue: Double,
+        saturation: Double,
+        value: Double,
+        usingLibrary: Boolean
+    ): Bitmap {
         val newBitmap = this.copy(Bitmap.Config.RGB_565, true)
 
         // height and width of Image
@@ -19,7 +24,10 @@ object RgbImageToHsv {
                 val oldPixel = this.getPixel(x, y)
 
                 // get hsv from rgb
-                val hsv = rgbToHsv(oldPixel.red, oldPixel.green, oldPixel.blue)
+                val hsv = if (usingLibrary)
+                    rgbToHsvAndroid(oldPixel.red, oldPixel.green, oldPixel.blue)
+                else
+                    rgbToHsv(oldPixel.red, oldPixel.green, oldPixel.blue)
 
                 val newHue = hsv[0] * hue
                 val newSaturation = hsv[1] * saturation
@@ -36,6 +44,12 @@ object RgbImageToHsv {
             }
         }
         return newBitmap
+    }
+
+    private fun rgbToHsvAndroid(red: Int, green: Int, blue: Int): FloatArray {
+        val hsv = FloatArray(3)
+        Color.RGBToHSV(red, green, blue, hsv)
+        return hsv
     }
 
     private fun rgbToHsv(red: Int, green: Int, blue: Int): FloatArray {

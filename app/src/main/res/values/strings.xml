@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Pengolahan Citra</string>
     <string name="text_rgb_to_hsv">RGB to HSV</string>
+    <string name="text_rgb_to_hsv_library">RGB to HSV using Library</string>
     <string name="text_salt_and_pepper">Salt and Pepper</string>
     <string name="text_restore_image">Restore Image</string>
 </resources>

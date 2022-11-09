@@ -118,6 +118,7 @@ class MainActivity : AppCompatActivity(), PermissionListener {
             }
 
             btnRgbToHsv.setOnClickListener { viewModel.updateBitmapToHsv() }
+            btnRgbToHsvLibrary.setOnClickListener { viewModel.updateBitmapToHsv(true) }
 
             btnUndo.setOnClickListener { viewModel.undoChanges() }
             btnRedo.setOnClickListener { viewModel.redoChanges() }

@@ -80,12 +80,12 @@ class MainViewModel : ViewModel() {
         clearRedoChanges()
     }
 
-    fun updateBitmapToHsv() {
+    fun updateBitmapToHsv(usingLibrary: Boolean = false) {
         val currentActiveBitmap = _activeBitmapState.value ?: return
         viewModelScope.launch(Dispatchers.IO) {
             _loadingState.emit(true)
             addUndo(currentActiveBitmap, true)
-            _activeBitmapState.value = currentActiveBitmap.manipulateHsv(0.5, 0.5, 0.5)
+            _activeBitmapState.value = currentActiveBitmap.manipulateHsv(0.5, 0.5, 0.5, usingLibrary)
             _loadingState.emit(false)
         }
     }
