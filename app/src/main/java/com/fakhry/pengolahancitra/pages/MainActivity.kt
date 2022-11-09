@@ -15,6 +15,7 @@ import com.fakhry.pengolahancitra.helpers.image_processing.ImageRotating
 import com.fakhry.pengolahancitra.helpers.image_restoration.NoiseRemover
 import com.fakhry.pengolahancitra.helpers.image_restoration.NoiseSetter
 import com.fakhry.pengolahancitra.utils.collectLifecycleFlow
+import com.fakhry.pengolahancitra.utils.custom_view.CustomProgress
 import com.fakhry.pengolahancitra.utils.isVisible
 import com.fakhry.pengolahancitra.utils.viewBinding
 import com.github.dhaval2404.imagepicker.ImagePicker
@@ -32,16 +33,21 @@ class MainActivity : AppCompatActivity(), PermissionListener {
     private val binding by viewBinding(ActivityMainBinding::inflate)
     private val viewModel by viewModels<MainViewModel>()
 
+    private lateinit var customProgress: CustomProgress
     private lateinit var defaultBitmap: Bitmap
     private var isPictureAdded: Boolean = false
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
+        initView()
         initListener()
         initObserver()
+    }
+
+    private fun initView() {
+        customProgress = CustomProgress(this)
     }
 
     private fun initListener() {
@@ -111,13 +117,23 @@ class MainActivity : AppCompatActivity(), PermissionListener {
                 } else showToast("Gambar belum ditambahkan.")
             }
 
+            btnRgbToHsv.setOnClickListener { viewModel.updateBitmapToHsv() }
+
             btnUndo.setOnClickListener { viewModel.undoChanges() }
             btnRedo.setOnClickListener { viewModel.redoChanges() }
         }
     }
 
     private fun initObserver() {
-        collectLifecycleFlow(viewModel.activeBitmapState) { binding.ivImageTaken.setImageBitmap(it) }
+        collectLifecycleFlow(viewModel.loadingState) { state -> customProgress.showLoading(state) }
+
+        collectLifecycleFlow(viewModel.activeBitmapState) { activeBitmap ->
+            isPictureAdded = activeBitmap != null
+            if (activeBitmap != null) {
+                defaultBitmap = activeBitmap
+            }
+            binding.ivImageTaken.setImageBitmap(activeBitmap)
+        }
 
         collectLifecycleFlow(viewModel.isButtonUndoEnabled) { binding.btnUndo.isVisible(it) }
 

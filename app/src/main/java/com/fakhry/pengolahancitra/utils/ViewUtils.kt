@@ -1,5 +1,6 @@
 package com.fakhry.pengolahancitra.utils
 
+import android.content.Context
 import android.view.View
 import androidx.appcompat.widget.AppCompatButton
 import androidx.appcompat.widget.AppCompatEditText
@@ -34,3 +35,5 @@ fun View.gone() {
 fun View.isVisible(state: Boolean, isGone: Boolean = false) {
     if (state) this.visible() else if (isGone) this.gone() else this.hide()
 }
+
+fun Int.toDp(context: Context): Float = context.resources.displayMetrics.density * this

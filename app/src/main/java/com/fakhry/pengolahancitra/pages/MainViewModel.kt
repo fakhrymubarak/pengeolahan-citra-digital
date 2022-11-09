@@ -3,12 +3,21 @@ package com.fakhry.pengolahancitra.pages
 import android.graphics.Bitmap
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.fakhry.pengolahancitra.helpers.pattern_recognition.RgbImageToHsv.manipulateHsv
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 
 class MainViewModel : ViewModel() {
     private val _activeBitmapState = MutableStateFlow<Bitmap?>(null)
     val activeBitmapState = _activeBitmapState.asStateFlow()
+
+    private val _loadingState = MutableSharedFlow<Boolean>()
+    val loadingState = _loadingState.asSharedFlow()
 
     private val _listChangesToUndo = arrayListOf<Bitmap>()
     private val _listChangesToRedo = arrayListOf<Bitmap>()
@@ -17,7 +26,8 @@ class MainViewModel : ViewModel() {
     val isButtonRedoEnabled = MutableStateFlow(false)
 
 
-    private fun addUndo(bitmap: Bitmap) {
+    private fun addUndo(bitmap: Bitmap, shouldClearRedo: Boolean = false) {
+        if (shouldClearRedo) clearRedoChanges()
         _listChangesToUndo.add(bitmap)
         isButtonUndoEnabled.value = true
         Log.e("MainViewModel", "undoChanges -> $_listChangesToUndo")
@@ -55,6 +65,7 @@ class MainViewModel : ViewModel() {
         }
 
         if (currentActiveBitmap != null) addUndo(currentActiveBitmap)
+        else isButtonUndoEnabled.value = true
     }
 
     private fun clearRedoChanges() {
@@ -67,5 +78,15 @@ class MainViewModel : ViewModel() {
         _activeBitmapState.value?.let { addUndo(it) }
         _activeBitmapState.value = bitmap
         clearRedoChanges()
+    }
+
+    fun updateBitmapToHsv() {
+        val currentActiveBitmap = _activeBitmapState.value ?: return
+        viewModelScope.launch(Dispatchers.IO) {
+            _loadingState.emit(true)
+            addUndo(currentActiveBitmap, true)
+            _activeBitmapState.value = currentActiveBitmap.manipulateHsv(0.5, 0.5, 0.5)
+            _loadingState.emit(false)
+        }
     }
 }
