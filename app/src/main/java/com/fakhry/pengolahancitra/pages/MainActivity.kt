@@ -12,8 +12,6 @@ import com.fakhry.pengolahancitra.databinding.ActivityMainBinding
 import com.fakhry.pengolahancitra.helpers.image_processing.ImageFilters
 import com.fakhry.pengolahancitra.helpers.image_processing.ImageFlipping
 import com.fakhry.pengolahancitra.helpers.image_processing.ImageRotating
-import com.fakhry.pengolahancitra.helpers.image_restoration.NoiseRemover
-import com.fakhry.pengolahancitra.helpers.image_restoration.NoiseSetter
 import com.fakhry.pengolahancitra.utils.collectLifecycleFlow
 import com.fakhry.pengolahancitra.utils.custom_view.CustomProgress
 import com.fakhry.pengolahancitra.utils.isVisible
@@ -104,19 +102,9 @@ class MainActivity : AppCompatActivity(), PermissionListener {
                     binding.ivImageTaken.setImageBitmap(defaultBitmap)
                 } else showToast("Gambar belum ditambahkan.")
             }
-            btnNoiseSalt.setOnClickListener {
-                if (isPictureAdded) {
-                    defaultBitmap = NoiseSetter.setNoiseSaltAndPepper(defaultBitmap)
-                    binding.ivImageTaken.setImageBitmap(defaultBitmap)
-                } else showToast("Gambar belum ditambahkan.")
-            }
-            btnAvgFilter.setOnClickListener {
-                if (isPictureAdded) {
-                    defaultBitmap = NoiseRemover.averageFilter(defaultBitmap)
-                    binding.ivImageTaken.setImageBitmap(defaultBitmap)
-                } else showToast("Gambar belum ditambahkan.")
-            }
 
+            btnNoiseSalt.setOnClickListener { viewModel.updateBitmapWithSaltPaper() }
+            btnAvgFilter.setOnClickListener { viewModel.updateBitmapWithAvgFilter() }
             btnRgbToHsv.setOnClickListener { viewModel.updateBitmapToHsv() }
             btnRgbToHsvLibrary.setOnClickListener { viewModel.updateBitmapToHsv(true) }
 

@@ -3,6 +3,8 @@ package com.fakhry.pengolahancitra.pages
 import android.graphics.Bitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.fakhry.pengolahancitra.helpers.image_restoration.NoiseRemover
+import com.fakhry.pengolahancitra.helpers.image_restoration.NoiseSetter
 import com.fakhry.pengolahancitra.helpers.pattern_recognition.RgbImageToHsv.manipulateHsv
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -24,7 +26,48 @@ class MainViewModel : ViewModel() {
     val isButtonUndoEnabled = MutableStateFlow(false)
     val isButtonRedoEnabled = MutableStateFlow(false)
 
+    fun setBitmap(bitmap: Bitmap) {
+        isButtonUndoEnabled.value = true
+        _activeBitmapState.value?.let { addUndo(it) }
+        _activeBitmapState.value = bitmap
+        clearRedoChanges()
+    }
 
+    /* SECTION - IMAGE PROCESSING*/
+
+    /* SECTION - IMAGE RESTORATION  */
+    fun updateBitmapWithSaltPaper() {
+        val currentActiveBitmap = _activeBitmapState.value ?: return
+        viewModelScope.launch(Dispatchers.IO) {
+            _loadingState.emit(true)
+            addUndo(currentActiveBitmap, true)
+            _activeBitmapState.value = NoiseSetter.setNoiseSaltAndPepper(currentActiveBitmap)
+            _loadingState.emit(false)
+        }
+    }
+
+    fun updateBitmapWithAvgFilter() {
+        val currentActiveBitmap = _activeBitmapState.value ?: return
+        viewModelScope.launch(Dispatchers.IO) {
+            _loadingState.emit(true)
+            addUndo(currentActiveBitmap, true)
+            _activeBitmapState.value = NoiseRemover.averageFilter(currentActiveBitmap)
+            _loadingState.emit(false)
+        }
+    }
+
+    /* SECTION - PATTERN RECOGNITION */
+    fun updateBitmapToHsv(usingLibrary: Boolean = false) {
+        val currentActiveBitmap = _activeBitmapState.value ?: return
+        viewModelScope.launch(Dispatchers.IO) {
+            _loadingState.emit(true)
+            addUndo(currentActiveBitmap, true)
+            _activeBitmapState.value = currentActiveBitmap.manipulateHsv(usingLibrary)
+            _loadingState.emit(false)
+        }
+    }
+
+    /* SECTION - UNDO AND REDO */
     private fun addUndo(bitmap: Bitmap, shouldClearRedo: Boolean = false) {
         if (shouldClearRedo) clearRedoChanges()
         _listChangesToUndo.add(bitmap)
@@ -68,22 +111,5 @@ class MainViewModel : ViewModel() {
     private fun clearRedoChanges() {
         _listChangesToRedo.clear()
         isButtonRedoEnabled.value = false
-    }
-
-    fun setBitmap(bitmap: Bitmap) {
-        isButtonUndoEnabled.value = true
-        _activeBitmapState.value?.let { addUndo(it) }
-        _activeBitmapState.value = bitmap
-        clearRedoChanges()
-    }
-
-    fun updateBitmapToHsv(usingLibrary: Boolean = false) {
-        val currentActiveBitmap = _activeBitmapState.value ?: return
-        viewModelScope.launch(Dispatchers.IO) {
-            _loadingState.emit(true)
-            addUndo(currentActiveBitmap, true)
-            _activeBitmapState.value = currentActiveBitmap.manipulateHsv(usingLibrary)
-            _loadingState.emit(false)
-        }
     }
 }

@@ -36,7 +36,7 @@ object NoiseSetter {
 
                 //set new pixel
                 val newPixel = if (randInt < noiseProb) {
-                    Color.argb(oldAlpha, 255, 255, 255)
+                    if (Random.nextBoolean()) Color.BLACK else Color.WHITE
                 } else {
                     Color.argb(oldAlpha, oldRed, oldGreen, oldBlue)
                 }

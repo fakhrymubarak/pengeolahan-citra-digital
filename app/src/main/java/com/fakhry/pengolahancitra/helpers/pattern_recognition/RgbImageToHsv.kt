@@ -9,7 +9,7 @@ import kotlin.math.abs
 import kotlin.math.roundToInt
 
 object RgbImageToHsv {
-    fun Bitmap.manipulateHsv(usingLibrary: Boolean): Bitmap {
+    suspend fun Bitmap.manipulateHsv(usingLibrary: Boolean): Bitmap {
         val newBitmap = this.copy(Bitmap.Config.RGB_565, true)
 
         // height and width of Image
