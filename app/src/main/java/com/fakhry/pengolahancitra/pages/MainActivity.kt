@@ -1,17 +1,22 @@
-package com.example.pengolahancitra
+package com.fakhry.pengolahancitra.pages
 
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import com.example.pengolahancitra.databinding.ActivityMainBinding
-import com.example.pengolahancitra.helpers.image_processing.ImageFilters
-import com.example.pengolahancitra.helpers.image_processing.ImageFlipping
-import com.example.pengolahancitra.helpers.image_processing.ImageRotating
-import com.example.pengolahancitra.helpers.image_restoration.NoiseRemover
-import com.example.pengolahancitra.helpers.image_restoration.NoiseSetter
+import com.fakhry.pengolahancitra.Utils
+import com.fakhry.pengolahancitra.databinding.ActivityMainBinding
+import com.fakhry.pengolahancitra.helpers.image_processing.ImageFilters
+import com.fakhry.pengolahancitra.helpers.image_processing.ImageFlipping
+import com.fakhry.pengolahancitra.helpers.image_processing.ImageRotating
+import com.fakhry.pengolahancitra.helpers.image_restoration.NoiseRemover
+import com.fakhry.pengolahancitra.helpers.image_restoration.NoiseSetter
+import com.fakhry.pengolahancitra.utils.collectLifecycleFlow
+import com.fakhry.pengolahancitra.utils.isVisible
+import com.fakhry.pengolahancitra.utils.viewBinding
 import com.github.dhaval2404.imagepicker.ImagePicker
 import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionDeniedResponse
@@ -24,21 +29,27 @@ import kotlinx.coroutines.runBlocking
  * Created by Fakhry on 28/05/2021.
  */
 class MainActivity : AppCompatActivity(), PermissionListener {
-    private lateinit var binding: ActivityMainBinding
+    private val binding by viewBinding(ActivityMainBinding::inflate)
+    private val viewModel by viewModels<MainViewModel>()
+
     private lateinit var defaultBitmap: Bitmap
     private var isPictureAdded: Boolean = false
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        initListener()
+        initObserver()
+    }
+
+    private fun initListener() {
         binding.apply {
             btnTakePicture.setOnClickListener {
-                addBitmap()
+                openImagePicker()
             }
             btnSave.setOnClickListener {
-
                 if (isPictureAdded) {
                     Utils.saveImage(defaultBitmap, this@MainActivity, "PCD")
                 } else showToast("Gambar belum ditambahkan.")
@@ -100,52 +111,17 @@ class MainActivity : AppCompatActivity(), PermissionListener {
                 } else showToast("Gambar belum ditambahkan.")
             }
 
-
-            btnTakePicture.setOnLongClickListener {
-                showToast("Ambil Citra")
-                true
-            }
-            btnSave.setOnLongClickListener {
-                showToast("Simpan Citra")
-                true
-            }
-            btnImageInformation.setOnLongClickListener {
-                showToast("Tampilkan Detail Citra")
-                true
-            }
-            btnSetToGrayscale.setOnLongClickListener {
-                showToast("Ubah Citra Ke Grayscale")
-                true
-            }
-            btnFlipHorizontal.setOnLongClickListener {
-                showToast("Flip Vertikal")
-                true
-            }
-            btnFlipVertical.setOnLongClickListener {
-                showToast("Flip Horizontal")
-                true
-            }
-            btnRotateLeft90.setOnLongClickListener {
-                showToast("Rotasi ke kiri")
-                true
-            }
-            btnRotateRight90.setOnLongClickListener {
-                showToast("Rotasi ke kanan")
-                true
-            }
-            btnMonochrome.setOnLongClickListener {
-                showToast("Ubah Citra ke Black and White")
-                true
-            }
-            btnNoiseSalt.setOnLongClickListener {
-                showToast("Berikan noise salt and papper ke citra")
-                true
-            }
-            btnAvgFilter.setOnLongClickListener {
-                showToast("Restorasi citra")
-                true
-            }
+            btnUndo.setOnClickListener { viewModel.undoChanges() }
+            btnRedo.setOnClickListener { viewModel.redoChanges() }
         }
+    }
+
+    private fun initObserver() {
+        collectLifecycleFlow(viewModel.activeBitmapState) { binding.ivImageTaken.setImageBitmap(it) }
+
+        collectLifecycleFlow(viewModel.isButtonUndoEnabled) { binding.btnUndo.isVisible(it) }
+
+        collectLifecycleFlow(viewModel.isButtonRedoEnabled) { binding.btnRedo.isVisible(it) }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -153,15 +129,11 @@ class MainActivity : AppCompatActivity(), PermissionListener {
         when (resultCode) {
             RESULT_OK -> {
                 val fileUri = data?.data!!
-                //Set Bitmap
-                defaultBitmap = BitmapFactory.decodeStream(contentResolver.openInputStream(fileUri))
-
-                isPictureAdded = true
-                binding.ivImageTaken.setImageBitmap(defaultBitmap)
-                binding.ivImageTaken.elevation = 0F
+                val bitmap = BitmapFactory.decodeStream(contentResolver.openInputStream(fileUri))
+                viewModel.setBitmap(bitmap)
             }
             ImagePicker.RESULT_ERROR -> {
-                showToast("ImagePicker.getError(data)")
+                showToast(ImagePicker.getError(data))
                 isPictureAdded = false
             }
             else -> {
@@ -171,7 +143,7 @@ class MainActivity : AppCompatActivity(), PermissionListener {
         }
     }
 
-    private fun addBitmap() {
+    private fun openImagePicker() {
         ImagePicker.with(this).start()
     }
 
@@ -180,7 +152,7 @@ class MainActivity : AppCompatActivity(), PermissionListener {
     }
 
     override fun onPermissionGranted(p0: PermissionGrantedResponse?) {
-        addBitmap()
+        openImagePicker()
     }
 
     override fun onPermissionDenied(p0: PermissionDeniedResponse?) {
@@ -195,5 +167,10 @@ class MainActivity : AppCompatActivity(), PermissionListener {
         p0: PermissionRequest?,
         p1: PermissionToken?
     ) {
+        Toast.makeText(
+            this,
+            "Tidak bisa mengakses kamera dan storage, silakan mengubahnya di setting.",
+            Toast.LENGTH_LONG
+        ).show()
     }
 }

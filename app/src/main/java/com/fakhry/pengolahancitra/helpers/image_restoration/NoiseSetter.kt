@@ -1,4 +1,4 @@
-package com.example.pengolahancitra.helpers.image_restoration
+package com.fakhry.pengolahancitra.helpers.image_restoration
 
 import android.graphics.Bitmap
 import android.graphics.Color

@@ -1,4 +1,4 @@
-package com.example.pengolahancitra.helpers.pattern_recognition
+package com.fakhry.pengolahancitra.helpers.pattern_recognition
 
 import android.graphics.Bitmap
 
